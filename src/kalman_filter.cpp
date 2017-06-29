@@ -1,5 +1,3 @@
-#include "ab_debug.h"
-
 #include "kalman_filter.h"
 #include <iostream>
 #include <math.h>
@@ -32,9 +30,7 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   new location: 			  x' = x + (K.y)
   new uncertainty covariance: P' = (I-K.H).P
   */
-  if (AB_DEBUG)
-	  debug_message("Entered KalmanFilter::Init()");
-
+  
   x_ = x_in; // object state
   P_ = P_in; // object covariance matrix, which contains information about the uncertainty of the object's position and velocity
   F_ = F_in; // state transition matrix -> how does the position change as function of velocity
@@ -44,9 +40,6 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 }
 
 void KalmanFilter::Predict() {
-  if (AB_DEBUG)
-	  debug_message("Entered KalmanFilter::Predict()");
-	
   /**
   TODO:
     * use information we have to predict the state of the pedestrian until the next measurement arrives

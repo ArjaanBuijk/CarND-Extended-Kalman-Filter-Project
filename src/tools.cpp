@@ -1,5 +1,3 @@
-#include "ab_debug.h"
-
 #include <iostream>
 #include "tools.h"
 
@@ -13,8 +11,6 @@ Tools::~Tools() {}
 
 VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
                               const vector<VectorXd> &ground_truth) {
-  if (AB_DEBUG)
-    debug_message("Entered Tools::CalculateRMSE()");
   /**
   TODO:
     * Calculate the RMSE here.
@@ -54,8 +50,6 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 }
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
-  if (AB_DEBUG)
-    debug_message("Entered Tools::CalculateJacobian()");
   /**
   TODO:
     * Calculate a Jacobian here.
@@ -88,8 +82,6 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 }
 
 VectorXd Tools::Calculate_h(const VectorXd& x_state){
-  if (AB_DEBUG)
-    debug_message("Entered Tools::Calculate_h()");
   /**
    * Calculate the h function to transform state (px, py, vx, vy) into 
    * radar measurement space (ro, theta, ro_dot)
@@ -102,38 +94,14 @@ VectorXd Tools::Calculate_h(const VectorXd& x_state){
   float vx = x_state(2);
   float vy = x_state(3);
    
-  if (AB_DEBUG){
-    cout<<"px="<<px<<'\n';
-    cout<<"py="<<py<<'\n';
-    cout<<"vx="<<vx<<'\n';
-    cout<<"vy="<<vy<<'\n';
-  }
   // h function (Lesson 5.14 & 5.20)
   h[0] = sqrt(px*px+py*py);
-  if (AB_DEBUG)
-    cout<<"h[0]="<<h[0]<<'\n';
-    
   h[1] = atan2(py, px);
-  
   if (h[0]<1.e-10){
     h[2] = 0.0;
-    if (AB_DEBUG)
-      cout<<"SMALL VALUE of h[0], setting h[2] to zero\n";
   }
   else{
     h[2] = (px*vx+py*vy) / h[0];
-    if (AB_DEBUG)
-      cout<<"h[2]="<<h[2]<<'\n';
   }
-  
-  if (AB_DEBUG){
-	 ostringstream s1;
-	 s1<<"\nh(0)="+std::to_string(h[0]);
-   s1<<"\nh(1)="+std::to_string(h[1]);
-   s1<<"\nh(2)="+std::to_string(h[2]);
-	 
-	 debug_message("Tools::Calculate_h: ", s1.str());
-	}
-   
-   return h;  
+  return h;  
 }

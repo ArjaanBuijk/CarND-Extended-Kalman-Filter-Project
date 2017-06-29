@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-const bool AB_DEBUG=true; 
+const bool AB_DEBUG=false; 
 const bool AB_WAIT=false;   // to wait each time a debug_message is given
 
 void debug_message(string s1);

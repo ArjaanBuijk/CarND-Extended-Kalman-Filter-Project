@@ -14,46 +14,46 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   /**
   TODO:
     * Calculate the RMSE here.
-	* See Lesson 5.23
+  * See Lesson 5.23
   */
   VectorXd rmse(4);
-	rmse << 0,0,0,0;
+  rmse << 0,0,0,0;
 
-	// check the validity of the following inputs:
-	//  * the estimation vector size should not be zero
-	//  * the estimation vector size should equal ground truth vector size
-	if(estimations.size() != ground_truth.size()
-			|| estimations.size() == 0){
-		cout << "Invalid estimation or ground_truth data" << endl;
-		return rmse;
-	}
+  // check the validity of the following inputs:
+  //  * the estimation vector size should not be zero
+  //  * the estimation vector size should equal ground truth vector size
+  if(estimations.size() != ground_truth.size()
+      || estimations.size() == 0){
+    cout << "Invalid estimation or ground_truth data" << endl;
+    return rmse;
+  }
 
-	//accumulate squared residuals
-	for(unsigned int i=0; i < estimations.size(); ++i){
+  //accumulate squared residuals
+  for(unsigned int i=0; i < estimations.size(); ++i){
 
-		VectorXd residual = estimations[i] - ground_truth[i];
+    VectorXd residual = estimations[i] - ground_truth[i];
 
-		//coefficient-wise multiplication
-		residual = residual.array()*residual.array();
-		rmse += residual;
-	}
+    //coefficient-wise multiplication
+    residual = residual.array()*residual.array();
+    rmse += residual;
+  }
 
-	//calculate the mean
-	rmse = rmse/estimations.size();
+  //calculate the mean
+  rmse = rmse/estimations.size();
 
-	//calculate the squared root
-	rmse = rmse.array().sqrt();
+  //calculate the squared root
+  rmse = rmse.array().sqrt();
   
 
-	//return the result
-	return rmse;
+  //return the result
+  return rmse;
 }
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   /**
   TODO:
     * Calculate a Jacobian here.
-	* See Lesson 5.19
+  * See Lesson 5.19
   */
   MatrixXd Hj(3,4);
   //recover state parameters
@@ -69,14 +69,14 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   
   //check division by zero
   if(fabs(c1) < 0.0001){
-  	cout << "CalculateJacobian () - Error - Division by Zero" << endl;
-  	return Hj;
+    std::cout << "CalculateJacobian () - Error - Division by Zero" << endl;
+    return Hj;
   }
   
   //compute the Jacobian matrix
   Hj << (px/c2), (py/c2), 0, 0,
-  	  -(py/c1), (px/c1), 0, 0,
-  	  py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+      -(py/c1), (px/c1), 0, 0,
+      py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
   
   return Hj;
 }

@@ -1,5 +1,3 @@
-#include "ab_debug.h"
-
 #include "FusionEKF.h"
 #include "tools.h"
 #include "Eigen/Dense"
@@ -14,9 +12,6 @@ using std::vector;
  * Constructor.
  */
 FusionEKF::FusionEKF() {
-  if (AB_DEBUG)
-    debug_message("Entered FusionEKF::FusionEKF()");
-
   is_initialized_ = 0;
 
   previous_timestamp_ = 0;
@@ -84,9 +79,6 @@ FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
-  if (AB_DEBUG)
-	  debug_message("Entered FusionEKF::ProcessMeasurement()");
-	  
   /*****************************************************************************
    *  Initialization
    ****************************************************************************/
@@ -98,12 +90,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       * Remember: you'll need to convert radar from polar to cartesian coordinates.
     */
     // still initializing
-	if (AB_DEBUG)
-	  debug_message("FusionEKF::ProcessMeasurement(): ", "Initializing state from initial measurements...");
-  
+	
 	if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-	  if (AB_DEBUG)
-	    debug_message("FusionEKF::ProcessMeasurement(): ", "It is RADAR, do not use to initialize...");
 	  // Radar is not as accurate, so always initialize from Lidar
 	  return;
 	}
@@ -134,11 +122,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	  float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;	//dt - expressed in seconds
 
 	  if (dt<1.e-10) { // wait for next measurement. do not yet initialize
-	    if (AB_DEBUG){
-		  string msg="Waiting with initialization untill next measurement. dt is too small : "+std::to_string(dt);
-		  debug_message("FusionEKF::ProcessMeasurement(): ", msg);
-		}
-		return;
+      return;
 	  }
 	  
 	  ekf_.x_[0] = measurement_pack.raw_measurements_[0]; // px
@@ -148,16 +132,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	  previous_timestamp_ = measurement_pack.timestamp_;
 	}
 	
-	if (AB_DEBUG){
-	  ostringstream s1;
-	  s1<<"Initialized state to:";
-	  s1<<"\npx="+std::to_string(ekf_.x_[0]);
-	  s1<<"\npy="+std::to_string(ekf_.x_[1]);
-	  s1<<"\nvx="+std::to_string(ekf_.x_[2]);
-	  s1<<"\nvy="+std::to_string(ekf_.x_[3]);
-	  debug_message("FusionEKF::ProcessMeasurement(): ", s1.str());
-	}
-
     // Note: no need to predict or update as part of initialization
     ++is_initialized_;
     return;

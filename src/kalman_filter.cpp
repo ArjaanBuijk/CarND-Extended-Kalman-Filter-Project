@@ -114,6 +114,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   */
   VectorXd y = z - tools_.Calculate_h(x_); // Lesson 5.14 & 5.20
   
+  // Normalize the angle to be within -pi, pi
+  float angle = y[1];
+  y[1] = atan2(sin(angle), cos(angle));
+  
   //TODO: this code is identical to Update(), so do not duplicate it here....
   
   MatrixXd Ht = H_.transpose();		

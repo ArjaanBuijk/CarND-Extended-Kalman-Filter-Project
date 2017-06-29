@@ -47,6 +47,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
 	//calculate the squared root
 	rmse = rmse.array().sqrt();
+  
 
 	//return the result
 	return rmse;
@@ -113,18 +114,6 @@ VectorXd Tools::Calculate_h(const VectorXd& x_state){
     cout<<"h[0]="<<h[0]<<'\n';
     
   h[1] = atan2(py, px);
-  if (AB_DEBUG)
-    cout<<"h[1]="<<h[1]<<'\n';
-  if (h[1]>M_PI) {
-    h[1]= h[1]-2*M_PI;
-    if (AB_DEBUG)
-      cout<<"NORMALIZED h[1]="<<h[1]<<'\n';
-  }
-  else if (h[1]< -M_PI) {
-    h[1]= h[1]+2*M_PI;
-    if (AB_DEBUG)
-      cout<<"NORMALIZED h[1]="<<h[1]<<'\n';
-  }
   
   if (h[0]<1.e-10){
     h[2] = 0.0;

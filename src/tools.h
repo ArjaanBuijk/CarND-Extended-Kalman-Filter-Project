@@ -35,6 +35,7 @@ public:
    * radar measurement space (ro, theta, ro_dot)
    */
   VectorXd Calculate_h(const VectorXd& x_state);
+  
 };
 
 #endif /* TOOLS_H_ */

@@ -46,7 +46,7 @@ int main()
     // The 2 signifies a websocket event
 
 	if (AB_DEBUG)
-		debug_message("main-h.onMessage: ", "Received something...");
+		//debug_message("main-h.onMessage: ", "Received something...");
 
     if (length && length > 2 && data[0] == '4' && data[1] == '2')
     {
@@ -135,7 +135,12 @@ int main()
     	  estimations.push_back(estimate);
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
-
+        
+        //AB_DEBUG
+        //write results
+        std::cout<<"time:"<<timestamp<<"\nestimate:\n"<<estimate<<"\ntruth:\n"<<gt_values<<"\nRMSE:\n"<<RMSE<<'\n';
+        //
+        
           json msgJson;
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;

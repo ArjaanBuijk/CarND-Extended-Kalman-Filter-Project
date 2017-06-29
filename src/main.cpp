@@ -1,5 +1,3 @@
-#include "ab_debug.h"
-
 #include <uWS/uWS.h>
 #include <iostream>
 #include "json.hpp"
@@ -45,9 +43,6 @@ int main()
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
 
-	if (AB_DEBUG)
-		//debug_message("main-h.onMessage: ", "Received something...");
-
     if (length && length > 2 && data[0] == '4' && data[1] == '2')
     {
 	  
@@ -72,9 +67,6 @@ int main()
     	  iss >> sensor_type;
 
     	  if (sensor_type.compare("L") == 0) {
-			    if (AB_DEBUG)
-	             debug_message("main-h.onMessage: ", "It's a Laser measurement");
-	             
       	  		meas_package.sensor_type_ = MeasurementPackage::LASER;
           		meas_package.raw_measurements_ = VectorXd(2);
           		float px;
@@ -85,9 +77,6 @@ int main()
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
           } else if (sensor_type.compare("R") == 0) {
-                if (AB_DEBUG)
-	             debug_message("main-h.onMessage: ", "It's a Radar measurement");
-	             
       	  		meas_package.sensor_type_ = MeasurementPackage::RADAR;
           		meas_package.raw_measurements_ = VectorXd(3);
           		float ro;
@@ -138,7 +127,7 @@ int main()
         
         //AB_DEBUG
         //write results
-        std::cout<<"time:"<<timestamp<<"\nestimate:\n"<<estimate<<"\ntruth:\n"<<gt_values<<"\nRMSE:\n"<<RMSE<<'\n';
+        //std::cout<<"time:"<<timestamp<<"\nestimate:\n"<<estimate<<"\ntruth:\n"<<gt_values<<"\nRMSE:\n"<<RMSE<<'\n';
         //
         
           json msgJson;
@@ -149,15 +138,7 @@ int main()
           msgJson["rmse_vx"] = RMSE(2);
           msgJson["rmse_vy"] = RMSE(3);
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
-		  
-		  if (AB_DEBUG){
-            debug_message("main-h.onMessage: ", "Sending this message back:");
-		    //std::cout << msg << std::endl;
-			debug_message("main-h.onMessage: ", msg);
-	      }
-		  
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-	  
         }
       } else {
         

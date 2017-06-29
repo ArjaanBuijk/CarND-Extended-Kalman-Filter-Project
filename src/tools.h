@@ -29,6 +29,12 @@ public:
   */
   MatrixXd CalculateJacobian(const VectorXd& x_state);
 
+   /**
+   * A helper method to calculate the h function
+   * to transform state (px, py, vx, vy) into 
+   * radar measurement space (ro, theta, ro_dot)
+   */
+  VectorXd Calculate_h(const VectorXd& x_state);
 };
 
 #endif /* TOOLS_H_ */

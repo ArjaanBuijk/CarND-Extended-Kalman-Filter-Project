@@ -6,9 +6,8 @@ using namespace std;
 void debug_wait()
 {
 	if (AB_WAIT) {
-		cout<<'\n'<<"WAITING until you enter a character";
-		cout<<'\n'<<'>'; 				// show a prompt to indicate we're waiting for something.
-		char AB_DUM=' '; cin>>AB_DUM;
+		cout<<'\n'<<"Press Enter to Continue>";
+		cin.ignore();
 	}
 	else{
 		cout<<'\n';

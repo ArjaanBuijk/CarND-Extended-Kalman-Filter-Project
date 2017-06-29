@@ -33,17 +33,27 @@ public:
 
 private:
   // check whether the tracking toolbox was initialized or not (first measurement)
-  bool is_initialized_;
+  int is_initialized_; // 0: no , 
+                       // 1: got one measurement, and initialized px, py
+					   // 2: got two measurements, also initialized vx, vy 
 
   // previous timestamp
   long long previous_timestamp_;
 
   // tool object used to compute Jacobian and RMSE
   Tools tools;
-  Eigen::MatrixXd R_laser_;
-  Eigen::MatrixXd R_radar_;
-  Eigen::MatrixXd H_laser_;
-  Eigen::MatrixXd Hj_;
+  Eigen::MatrixXd R_laser_; //measurement covariance matrix - laser
+  Eigen::MatrixXd R_radar_; //measurement covariance matrix - radar
+  Eigen::MatrixXd H_laser_; //measurement matrix - laser
+  Eigen::MatrixXd Hj_;      //measurement matrix (Jacobian) - radar
+  
+  // AB
+  // acceleration noise components
+  float noise_ax;
+  float noise_ay;
+  
+  // to call helper functions
+  Tools tools_;
 };
 
 #endif /* FusionEKF_H_ */

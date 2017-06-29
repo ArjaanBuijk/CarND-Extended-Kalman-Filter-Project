@@ -48,10 +48,10 @@ void KalmanFilter::Predict() {
 
   */
   // See Lesson 5.13
-  x_ = F_ * x_;          // this is just x(k+1) = x + vx*dt ; vx(k+1)=vx(k)
+  x_ = F_ * x_;              // this is just x(k+1) = x + vx*dt ; vx(k+1)=vx(k)
   MatrixXd Ft = F_.transpose(); 
   P_ = F_ * P_ * Ft + Q_;    // this updates the covariance (uncertainty in state) due to unknown 
-                // accelerations that happened during dt
+                             // accelerations that happened during dt
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
@@ -66,34 +66,34 @@ void KalmanFilter::Update(const VectorXd &z) {
   */
   // This function is for Laser, See Lesson 3.11, 3.24 & Lesson 5.13
   VectorXd z_pred = H_ * x_;      // (Lesson 5.10)
-                  // For laser, H_ is
-                  //    1, 0, 0, 0
-                  //    0, 1, 0, 0
-                  // So, this just transforms the predicted state vector x_ (px', py', vx', vy')
-                  // into the measurement space of the sensor z = (px, py)
-                  // This can be done simpler: z_pred[0] = x_[0]; z_pred[1] = x_[1];
+                                  // For laser, H_ is
+                                  //    1, 0, 0, 0
+                                  //    0, 1, 0, 0
+                                  // So, this just transforms the predicted state vector x_ (px', py', vx', vy')
+                                  // into the measurement space of the sensor z = (px, py)
+                                  // This can be done simpler: z_pred[0] = x_[0]; z_pred[1] = x_[1];
 
   VectorXd y = z - z_pred;        // This calculates the error between measured and predicted state
   MatrixXd Ht = H_.transpose();    
-  MatrixXd S = H_ * P_ * Ht + R_;  // (Lesson 3.24)
-                  // "Project system uncertainty error into the measurement space..."
-                  // Basically, just transforming the covariance matrices to work
-                  // on (px, py) data only, ignoring (vx,vy) because those are not
-                  // measured by laser.
-                  // S is a (2x2) matrix, like R_laser_
-                  // This can also be done much quicker, without matrix multiplications,
-                  // which are mostly multiplication with 0s and thus a waste.
+  MatrixXd S = H_ * P_ * Ht + R_; // (Lesson 3.24)
+                                  // "Project system uncertainty error into the measurement space..."
+                                  // Basically, just transforming the covariance matrices to work
+                                  // on (px, py) data only, ignoring (vx,vy) because those are not
+                                  // measured by laser.
+                                  // S is a (2x2) matrix, like R_laser_
+                                  // This can also be done much quicker, without matrix multiplications,
+                                  // which are mostly multiplication with 0s and thus a waste.
                                   
   MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
-  MatrixXd K = PHt * Si;      // (Lesson 3.24)
-                  // K is often called the 'Kalman gain' 
+  MatrixXd K = PHt * Si;          // (Lesson 3.24)
+                                  // K is often called the 'Kalman gain' 
   
-  //new estimate for        // (Lesson 3.24)
-  x_ = x_ + (K * y);        // update both position & velocity estimate
+  //new estimate                  // (Lesson 3.24)
+  x_ = x_ + (K * y);              // update both position & velocity estimate
   long x_size = x_.size();
   MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  P_ = (I - K * H_) * P_;      // update covariance 
+  P_ = (I - K * H_) * P_;         // update covariance 
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -111,7 +111,9 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float angle = y[1];
   y[1] = atan2(sin(angle), cos(angle));
   
-  //TODO: this code is identical to Update(), so do not duplicate it here....
+  //NOTE: 
+  //rest of this code is identical to code used in Update()
+  //consider to refactor this into another function, but for now, I just copy/pasted.
   
   MatrixXd Ht = H_.transpose();    
   MatrixXd S = H_ * P_ * Ht + R_;  

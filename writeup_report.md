@@ -33,8 +33,8 @@ In tools.cpp helper functions are defined used in the radar measurement update:
 
 | Helper Function   | Description |
 |-------------------|-------------|
-| Calculate_h		| To calculate the non-linear mapping function, known as the 'h function'.<br><br>This function transforms the object's location & velocity from a 2D cartesian coordinate system (px, py, vx, vy), into a 2D polar coordinate system (ro, theta, ro_dot). The 2D polar system is what the Radar sensor uses, and the measurement update step of the Extended Kalman filter is done in the 2D polar coordinate system: <br> <img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Radar_Measurement_Space.png?raw=true" alt="Radar_Measurement_Space" style="width: 400px;"/>|
-| CalculateJacobian | To calculate the Jacobian Matrix of the 'h function'.<br><br>To maintain gaussian shapes of the covariances (=uncertainties) during the measurement update, a linear mapping function must be used. For this reason, the h function is linearized with a first order Taylor series expansion:<br>![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/MultiDimensionTaylorSeries.PNG?raw=true)<br>The Jacobian Matrix contains the first derivates of the h function:<br>    ![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Jacobian.PNG?raw=true)|
+| Calculate_h		| To calculate the non-linear mapping function, known as the 'h function'.<br><br>The measurement update step of the Extended Kalman filter is done in a 2D polar coordinate system because that is what Radar sensors use. The 'h function' transforms the object's location & velocity from a 2D cartesian coordinate system into a 2D polar coordinate system: <br> <div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Radar_Measurement_Space.png?raw=true" style="width: 300px;"/></div>|
+| CalculateJacobian | To calculate the Jacobian Matrix of the 'h function'.<br><br>To maintain gaussian shapes of the covariances (=uncertainties) during a measurement update step, a linear mapping function must be used. For this reason, the non-linear h function is linearized with a first order Taylor series expansion:<br> <div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/MultiDimensionTaylorSeries.PNG?raw=true" style="width: 400px;"/></div><br>The Jacobian Matrix contains the first derivates of the h function:<br> <div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Jacobian.PNG?raw=true" style="width: 300px;"/></div>|
 | CalculateRMSE     | To calculate the Root Mean Squared Error between predicted and ground truth trajectories|
 
 ---
@@ -46,20 +46,20 @@ The implementation is done in these files:
 | File | Description |
 |-------|-------------|
 |main.cpp| Implements a web-server that receives sensor measurments. When it receives a measurment from the simulator, the following is done in this function:<br>- extract the data<br>- create a 'measurement package'<br>- call FusionEKF to process the measurement<br>- calculates RSME<br>- sends updated location and RSME back to simulator
-|FusionEKF.cpp|Processes the measurements, as follows:<br>- initialize location (px,py) from first Lidar measurement<br>- initialize velocity (vx,vy) from second Lidar measurement<br>- does predict and update step for next Lidar and Radar measurements<br><br>The initialization of the object's state is using the first two Lidar measurements, and not a Radar measurement, because Lidar is more accurate in position detection.<br><br>The initial estimate of the velocity is calculated as (dx/dt, dy/dt) between the first two Lidar measurements.|
-|kalman_filter.cpp|Implements the predict and measurement update steps, called from FusionEKF:<br>- Predict: predict new location assuming constant velocity.<br>- Update: applies Kalman Filter update step for Lidar<br>- UpdateEKF: applies Extended Kalman Filter update for Radar|
+|FusionEKF.cpp|Processes the measurements, as follows:<br>- initialize location (px,py) from first Lidar measurement<br>- initialize velocity (vx,vy) from second Lidar measurement<br>- does predict and update step for next Lidar and Radar measurements<br>- returns prediction of new location and velocity<br><br>The initialization of the object's state is using the first two Lidar measurements, and not a Radar measurement, because Lidar is more accurate in position detection. Also, the velocity measurement of a Radar sensor is not very accurate and not suitable to initialize the velocity of the object.<br><br>The initial estimate of the velocity is calculated as (dx/dt, dy/dt) between the first two Lidar measurements.|
+|kalman_filter.cpp|Implements the predict and update steps in these functions:<br>- Predict: predict new location assuming constant velocity.<br>- Update: applies Kalman Filter update step for Lidar<br>- UpdateEKF: applies Extended Kalman Filter update for Radar|
 
-The implementation was done in straight-forward manner by using VectorXd and MatrixXd of the provided Eigen library. This keeps the implementation simple and easily readable since the code is nearly identical as the actual equations in Matrix notation. It not really optimal though for speed, since there are a lot of multiplications by zero that are not necessary. However, the code was not optimized for this.
+The implementation was done in a straight-forward manner by using VectorXd and MatrixXd from the provided Eigen library. This keeps the implementation simple and easily readable since the code is nearly identical as the actual equations in Matrix notation. It not really optimal though for speed, since there are a lot of multiplications by zero that are not necessary.
 
 During the update for the radar measurement (UpdateEKF), the state (ro, theta, ro_dot) is first updated by subtracting the h function from the predicted state. This can potentially lead to a value for theta that falls outside [-pi, pi]. A normalization is applied to ensure that theta falls within [-pi, pi], using:
 
-y[1] = atan2(sin(angle), cos(angle));
+    y[1] = atan2(sin(angle), cos(angle));  // Normalize angle to value between [-pi, pi]
 
 ---
 
 # 4. Results
 
-Three trajectory predictions were tested:
+Three trajectory predictions were calculated:
 
 1. Using Lidar measurements only
 2. Using Radar measurements only
@@ -69,24 +69,27 @@ The result is summarized in this table:
 
 |Method        |RMSE<br>px|RMSE<br>py|RMSE<br>vx|RMSE<br>vy|Trajectory Prediction|
 |--------------|----------|----------|----------|----------|----------|
-|Lidar only    |
-|Radar only (*)|
-|Lidar & Radar |
+|Lidar only    |0.1839|0.1544|0.5931|0.5833|<div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/1.RMSE-Lidar-Only.PNG?raw=true" style="width: 300px;"/>|
+|Radar only (*)|0.2327|0.3348|0.5607|0.7178|<div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/2.RMSE-Radar-Only.PNG?raw=true" style="width: 300px;"/>|
+|Lidar & Radar |0.0988|0.0850|0.4328|0.4751|<div style="text-align:center"><img src="https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/3.RMSE-Lidar-and-Radar.PNG?raw=true" style="width: 300px;"/>|
 
-(*) In all cases, the first two Lidar measurements were used to initialize the estimate of location and velocity. After initialization was completed, the Radar only case ignored the Lidar measurements.
+(*) In all cases, the first two Lidar measurements were used to initialize the estimate of location and velocity. After initialization was completed, the Radar only case ignored the rest of the Lidar measurements.
 
 # 5. Summary
 
-The end result can be summarized as follows:
+The result can be summarized as follows:
 
-- The classifier is able to detect both the white & black car very good in individual frames.
-- The classifier does detect a fair amount of false positives, sometimes with high confidence.
-- An elaborate heatmap thresholding over 14-17 frames was needed to eliminate the false positives while keeping the true positives.
+- When using Lidar only, the result is more accurate than using Radar only.
+- Even though Radar-only is giving a less accurate result than Lidar-only, when fusing the Radar sensor measurements with the Lidar sensor measurements, the prediction becomes more accurate.
+- Only with sensor fusion is the RMSE [0.0988, 0.0850, 0.4328, 0.4751] below the required target [0.11, 0.11, 0.52, 0.52].
 
+Even though it works well for this example and in the simulator environment, there is definitely a lot of room for improvement. Concretely, I would focus on improving the following C++ implementation issues:
 
-Even though it works well for this video, there is definitely a lot of room for improvement. I feel there are way too many false positives and rely too heavily on an elaborate heatmap thresholding which is brittle. I do not expect the current logic to work well on other cases without having to do significant work in fine-tuning the classifier and the thresholding.
+1. Refactoring the code:
+   - The state variables are public. It would be better to encapsulate them into private variables.
+   - Duplicate code is used in Update() and UpdateEKF().
+2. Speed up:
+   - Instead of using matrix multiplacations, it will be advantageous to eliminate all the multiplications by 0.
+3. Error handling:
+   - The code does not nicely handle errors. It just quits or core dumps. This would be unacceptable for production code, and a good error handling must be implemented.
 
-Concretely, to improve it, I would focus on:
-
-- Optimize the classifier. 
-- Use more or better training data, especially for non-vehicles.

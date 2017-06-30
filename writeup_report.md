@@ -21,24 +21,23 @@ My project includes the following files:
 
 - [<b>C++</b> - The source code](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/tree/master/src)
 - [<b>writeup_report.md</b> - A summary of the project](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/writeup_report.md)
-- [<b>videoProject.mp4</b> - The project video with boxes drawn around cars](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/videoProject.mp4)
+- [<b>videoProject.mp4</b> - A video showing prediction (green) compared to sensor data (red=Lidar, blue=Radar)](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/videoProject.mp4)
 
 <b>Animated gif of the video:</b>
     ![track1](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/videoProject.gif?raw=true)
-  
+
 ---
 
 # 2. helper functions
 
-In tools.cpp, 3 helper functions are defined to implement the radar measurement update:
+In tools.cpp helper functions are defined used in the radar measurement update:
 
-![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Radar_Measurement_Space.png?raw=true)
 
 | Helper Function   | Description |
 |-------------------|-------------|
-| Calculate_h		| To calculate the non-linear mapping function, known as the 'h function', which is used to transform the object state (px, py, vx, vy) into the radar measurement space (ro, theta, ro_dot).
-| CalculateJacobian | To calculate Jacobian that linearizes
-| CalculateRMSE     | To calculate the Root Mean Square Error between predicted and ground truth trajectories|
+| Calculate_h		| To calculate the non-linear mapping function, known as the 'h function'.<br><br>This function transforms the object's location & velocity from a 2D cartesian coordinate system (px, py, vx, vy), into a 2D polar coordinate system (ro, theta, ro_dot). The 2D polar system is what the Radar sensor uses, and the measurement update step of the Extended Kalman filter is done in the 2D polar coordinate system: <br> ![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Radar_Measurement_Space.png?raw=true)|
+| CalculateJacobian | To calculate the Jacobian Matrix of the 'h function'.<br><br>To maintain gaussian shapes of the covariances (=uncertainties) during the measurement update, a linear mapping function must be used. For this reason, the h function is linearized with a first order Taylor series expansion:<br>![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/MultiDimensionTaylorSeries.PNG?raw=true)<br>The Jacobian Matrix contains the first derivates of the h function:<br>    ![Image](https://github.com/ArjaanBuijk/CarND-Extended-Kalman-Filter-Project/blob/master/images/Jacobian.PNG?raw=true)|
+| CalculateRMSE     | To calculate the Root Mean Squared Error between predicted and ground truth trajectories|
 
 ---
 
